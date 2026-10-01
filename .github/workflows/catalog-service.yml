@@ -30,15 +30,11 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      ### initial setup just to verify build
+      - name: Make Maven wrapper executable
+        run: chmod +x mvnw
+
       - name: Build with Maven
         run: ./mvnw -ntp verify
-
-#      - name: Make Maven wrapper executable
-#        run: chmod +x mvnw
-
-#      - name: Build with Maven
-#        run: ./mvnw -ntp verify
 
 #      - if: ${{ github.ref == 'refs/heads/main' }}
 #        name: Login to Docker Hub
