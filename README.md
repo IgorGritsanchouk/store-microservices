@@ -33,8 +33,10 @@ http://localhost:8081/swagger-ui/index.html
 PS C:\DEV\store-microservices> git ls-files --stage catalog-service/mvnw
 100644 bd8896bf2217b46faa0291585e01ac1a3441a958 0       catalog-service/mvnw
 instead of  100644   IT NEEDS TO BE:  100755
-use Git Bash
-
+PS C:\DEV\store-microservices> git update-index --chmod=+x catalog-service/mvnw
+PS C:\DEV\store-microservices> git ls-files --stage catalog-service/mvnw
+100755 bd8896bf2217b46faa0291585e01ac1a3441a958 0       catalog-service/mvnw
+100755  --  OK   now
 ########    docker related   #########
 PS C:\DEV\store-microservices> cd deployment/docker-compose
 PS C:\DEV\store-microservices\deployment\docker-compose>
