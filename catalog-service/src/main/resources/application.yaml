@@ -16,6 +16,9 @@ management:
       exposure:
         include: "*"
 
+## might not be needed
+catalog:
+  page-size: 10
 
 ######## Database Configuration #########
 #spring:
