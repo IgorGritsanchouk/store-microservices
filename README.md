@@ -28,6 +28,7 @@ http://localhost:8081/actuator
 http://localhost:8081/actuator/health
 http://localhost:8081/actuator/metrics
 // documentation
+http://localhost:8081/api/products
 http://localhost:8081/swagger-ui/index.html
 http://localhost:8081/api/products?page=1
 http://localhost:8081/api/product{P101}
@@ -52,12 +53,35 @@ PS C:\DEV\store-microservices> task
 PS C:\DEV\store-microservices> task test
 PS C:\DEV\store-microservices> task start_infra  
 PS C:\DEV\store-microservices> task stop_infra
+PS C:\DEV\store-microservices> task start    # infra and apps together
+PS C:\DEV\store-microservices> task stop
+task: [build] mvnw.cmd -pl catalog-service spring-boot:build-image -DskipTests
 ########    docker related   #########
+PS C:\DEV\store-microservices> docker stack ls
+docker stack rm <stack-name>
+PS C:\DEV\store-microservices> task format
+PS C:\DEV\store-microservices> ./mvnw clean package
+docker ps -a
+./mvnw.cmd -pl catalog-service spring-boot:build-image -DskipTests
+
 PS C:\DEV\store-microservices> cd deployment/docker-compose
 PS C:\DEV\store-microservices\deployment\docker-compose>
 docker compose -f infra.yaml up -d
 docker compose -f infra.yaml down -d 
 
+1.In docker generate user name and token
+app.dpscker.com/accounts/igr025/settings/
+Account Information -> Personal access tokens -> Generate new token
+DOCKERHUB_USERNAME     igr023
+DOCKERHUB_TOKEN        dckr_pat_CnyQjWQj......
+2. github settingd
+https://github.com/IgorGritsanchouk/store-microservices
+Settings -> Secrets and variables -> Actions - new repository secret
+https://github.com/docker/login-action
+3.  add new credentials to github/workflows/catalog-service.yml  
+    name: Login to Docker Hub
+    name: Build and Publish Docker Image
+so that CI pipeline could log into docker repository and push  newly build image !!!!!
 ======= Testing concepts strategies ========
 Controller -> Service -> Repository -> DB
 1. INTEGRATION TESTING

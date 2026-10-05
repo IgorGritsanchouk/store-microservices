@@ -21,6 +21,7 @@
 		<springdoc-openapi.version>3.1.1</springdoc-openapi.version>
 		<spotless-maven-plugin.version>3.8.0</spotless-maven-plugin.version>
 		<rest-assured.version>6.0.1</rest-assured.version>
+		<dockerImageName>igr025/${project.artifactId}-img:v0.1</dockerImageName>
 	</properties>
 
 	<dependencies>
@@ -125,6 +126,11 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<image>
+						<name>${dockerImageName}</name>
+					</image>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>
