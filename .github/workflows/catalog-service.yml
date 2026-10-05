@@ -16,7 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       working-directory: ./catalog-service
-      DOCKER_IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/catalog-service-img:v0.1
+      DOCKER_IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/catalog-service-img
+      DOCKER_IMAGE_TAG: v0.1
     defaults:
       run:
         working-directory: ${{ env.working-directory }}
