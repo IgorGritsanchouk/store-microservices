@@ -10,6 +10,9 @@ Maven home: C:\Apps\apache-maven-3.8.5
 !!!!!!  Installing mvn wrapper:  !!!!!!
 mvn wrapper:wrapper
 PS C:\DEV\store-microservices> mvn wrapper:wrapper
+PS C:\DEV\store-microservices> ./mvnw spotless:apply
+PS C:\DEV\store-microservices> ./mvnw clean package -DskipTest
+
 !!!!  Building using wrapper  !!!!
 ./mvnw -ntp verify       ###just to verify build
 PS C:\DEV\store-microservices> ./mvnw clean package
@@ -93,5 +96,44 @@ Slice Test Annotation  -->  Slice Testing
 3. Test only Repository  
 @DataJpaTest
 
+====  manually runed docker ans spotless commands  =====
+--- Start containers---
+deployment>docker-compose>docker compose -f infra.yml up -d
+PS C:\DEV\store-microservices\deployment\docker-compose> docker compose -f infra.yml up -d
+[+] Running 1/1
+✔ Container orders-db-cnr  Started   
+--- stop containers ---
+deployment>docker-compose>docker compose -f infra.yml down
+./mvnw spotless:apply
 
+====  manually added dependency  =====
+##   swagger-ui ##
+http://localhost:8081/swagger-ui/index.html
+http://localhost:8082/swagger-ui/index.html
+---  swagger pom.xml  dependency required  ---
+<springdoc-openapi.version>3.1.1</springdoc-openapi.version>
+<dependency>
+<groupId>org.springdoc</groupId>
+<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+<version>${springdoc-openapi.version}</version>
+</dependency>
+---  rest assured dependency  ---
+<dependency>
+<groupId>io.rest-assured</groupId>
+<artifactId>rest-assured</artifactId>
+<scope>test</scope>
+</dependency>
 
+-----------------------------------------------------------------
+# to access RbbitMQ
+http://localhost:15672/       user:guest    password: guest
+# to verify which beans instantiated in spring boot
+http://localhost:8082/actuator/beans
+Search for these four names:
+rabbitConnectionFactory
+rabbitTemplate
+rabbitAdmin
+amqpAdmin
+
+http://localhost:8082/actuator/conditions
+RabbitAutoConfiguration
