@@ -137,3 +137,16 @@ amqpAdmin
 
 http://localhost:8082/actuator/conditions
 RabbitAutoConfiguration
+
+-------  resilience4j -------
+https://resilience4j.readme.io/docs/circuitbreaker
+https://resilience4j.readme.io/docs/timeout
+
+-- circutbreaker settings and behaviours ---
+http://localhost:8082/actuator/circuitbreakers
+http://localhost:8082/actuator/circuitbreakerevents
+
+===  viermock with test containers ------
+https://testcontainers.com/guides/testing-rest-api-integrations-in-micronaut-apps-using-wiremock/
+
+

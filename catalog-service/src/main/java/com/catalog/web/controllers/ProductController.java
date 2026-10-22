@@ -28,9 +28,19 @@ class ProductController {
     @GetMapping("/{code}")
     ResponseEntity<Product> getProductByCode(@PathVariable String code) {
         log.info("Fetching product for code: {}", code);
+        // sleep();  // testing circutbreaker
         return productService
                 .getProductByCode(code)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> ProductNotFoundException.forCode(code));
+    }
+
+    // this is just for demo purposes. to trigger circut breaker and retries on 6sec response
+    void sleep() {
+        try {
+            Thread.sleep(6000);
+        } catch (InterruptedException ie) {
+            ie.printStackTrace();
+        }
     }
 }
