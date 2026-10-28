@@ -1,17 +1,23 @@
 package com.orders.web.controllers;
 
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
 import com.orders.AbstractIT;
+import com.orders.domain.models.OrderSummary;
 import com.orders.testdata.TestDataFactory;
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
 import java.math.BigDecimal;
+import java.util.List;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-// import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql;
 
-// @Sql("/test-orders.sql")
+@Sql("/test-orders.sql")
 class OrderControllerTests extends AbstractIT {
 
     @Nested
@@ -25,7 +31,7 @@ class OrderControllerTests extends AbstractIT {
             var payload = """
         {
             "customer" : {
-            "name" : "Philip",
+            "name" : "user111",
                     "email" : "phil@gmail.com",
                     "phone":"0449636508"
         },
@@ -35,7 +41,7 @@ class OrderControllerTests extends AbstractIT {
                     "city" : "Hailing Iceland",
                     "state" : "Hampshire",
                     "zipCode" : "HR65ZX",
-                    "country" : "United Kingdom"
+                    "country" : "UK"
         },
             "items" : [
             {
@@ -44,9 +50,8 @@ class OrderControllerTests extends AbstractIT {
                     "price" : 25.50,
                     "quantity" : 1
             }
-   ]
+            ]
         }
-
         """;
             given().contentType(ContentType.JSON)
                     // .header("Authorization", "Bearer " + getToken())
@@ -61,7 +66,7 @@ class OrderControllerTests extends AbstractIT {
                     .body("orderNumber", notNullValue());
         }
 
-        // @Test
+        @Test
         void shouldReturnBadRequestWhenMandatoryDataIsMissing() {
             var payload = TestDataFactory.createOrderRequestWithInvalidCustomer();
             given().contentType(ContentType.JSON)
@@ -74,36 +79,36 @@ class OrderControllerTests extends AbstractIT {
         }
     }
 
-    //    @Nested
-    //    class GetOrdersTests {
-    //        @Test
-    //        void shouldGetOrdersSuccessfully() {
-    //            List<OrderSummary> orderSummaries = given().when()
-    //                    .header("Authorization", "Bearer " + getToken())
-    //                    .get("/api/orders")
-    //                    .then()
-    //                    .statusCode(200)
-    //                    .extract()
-    //                    .body()
-    //                    .as(new TypeRef<>() {});
-    //
-    //            assertThat(orderSummaries).hasSize(2);
-    //        }
-    //    }
-    //
-    //    @Nested
-    //    class GetOrderByOrderNumberTests {
-    //        String orderNumber = "order-123";
-    //
-    //        @Test
-    //        void shouldGetOrderSuccessfully() {
-    //            given().when()
-    //                    .header("Authorization", "Bearer " + getToken())
-    //                    .get("/api/orders/{orderNumber}", orderNumber)
-    //                    .then()
-    //                    .statusCode(200)
-    //                    .body("orderNumber", is(orderNumber))
-    //                    .body("items.size()", is(2));
-    //        }
-    //    }
+    @Nested
+    class GetOrdersTests {
+        @Test
+        void shouldGetOrdersSuccessfully() {
+            List<OrderSummary> orderSummaries = given().when()
+                    // .header("Authorization", "Bearer " + getToken())
+                    .get("/api/orders")
+                    .then()
+                    .statusCode(200)
+                    .extract()
+                    .body()
+                    .as(new TypeRef<>() {});
+
+            assertThat(orderSummaries).hasSize(2);
+        }
+    }
+
+    @Nested
+    class GetOrderByOrderNumberTests {
+        String orderNumber = "order-123";
+
+        @Test
+        void shouldGetOrderSuccessfully() {
+            given().when()
+                    // .header("Authorization", "Bearer " + getToken())
+                    .get("/api/orders/{orderNumber}", orderNumber)
+                    .then()
+                    .statusCode(200)
+                    .body("orderNumber", is(orderNumber))
+                    .body("items.size()", is(2));
+        }
+    }
 }

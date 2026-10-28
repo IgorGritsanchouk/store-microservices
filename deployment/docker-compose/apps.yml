@@ -25,68 +25,69 @@ services:
 #      logging: "promtail"
 
 
-#  order-service:
-#    image: sivaprasadreddy/bookstore-order-service
-#    container_name: order-service
- #   environment:
-#      - SPRING_PROFILES_ACTIVE=docker
-#      - ORDERS_CATALOG_SERVICE_URL=http://api-gateway:8989/catalog
-#      - DB_URL=jdbc:postgresql://orders-db:5432/postgres
-#      - DB_USERNAME=postgres
-#      - DB_PASSWORD=postgres
- #     - RABBITMQ_HOST=bookstore-rabbitmq
-#      - RABBITMQ_PORT=5672
- #     - RABBITMQ_USERNAME=guest
- #     - RABBITMQ_PASSWORD=guest
+  order-service:
+    image: igr025/order-service-img:v0.1
+    container_name: order-service-cnr
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - ORDERS_CATALOG_SERVICE_URL=http://catalog-service-cnr:8081
+  #    - ORDERS_CATALOG_SERVICE_URL=http://api-gateway:8989/catalog
+      - DB_URL=jdbc:postgresql://orders-db-cnr:5432/orders_pgs_db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - RABBITMQ_HOST=store-rabbitmq-cnr
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
 #      - OAUTH2_SERVER_URL=http://keycloak:9191
 #      - SWAGGER_API_GATEWAY_URL=http://api-gateway:8989/orders
 #      - MANAGEMENT_TRACING_EXPORT_ENABLED=${MANAGEMENT_TRACING_EXPORT_ENABLED}
 #      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411
-#    ports:
-#      - "8082:8082"
-#    restart: unless-stopped
-#    depends_on:
-#      orders-db:
-#        condition: service_healthy
-#      bookstore-rabbitmq:
-#        condition: service_healthy
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 700m
+    ports:
+      - "8082:8082"
+    restart: unless-stopped
+    depends_on:
+      orders-db:
+        condition: service_healthy
+      store-rabbitmq:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 700m
 #    labels:
 #      logging: "promtail"
 
-#  notification-service:
- #   image: sivaprasadreddy/bookstore-notification-service
- #   container_name: notification-service
-#    environment:
-#      - SPRING_PROFILES_ACTIVE=docker
-#      - DB_URL=jdbc:postgresql://notifications-db:5432/postgres
-#      - DB_USERNAME=postgres
-#      - DB_PASSWORD=postgres
-#      - RABBITMQ_HOST=bookstore-rabbitmq
-#      - RABBITMQ_PORT=5672
-#      - RABBITMQ_USERNAME=guest
-#      - RABBITMQ_PASSWORD=guest
-#      - MAIL_HOST=mailhog
-#      - MAIL_PORT=1025
+  notification-service:
+    image: igr025/notification-service-img
+    container_name: notification-service-cnr
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_URL=jdbc:postgresql://notifications-db:5432/notifications_pgs_db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - RABBITMQ_HOST=store-rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+      - MAIL_HOST=mail-hog
+      - MAIL_PORT=1025
 #      - MANAGEMENT_TRACING_EXPORT_ENABLED=${MANAGEMENT_TRACING_EXPORT_ENABLED}
 #      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411
-#    ports:
-#      - "8083:8083"
-#    restart: unless-stopped
-#    depends_on:
-#      notifications-db:
-#        condition: service_healthy
-#      bookstore-rabbitmq:
-#        condition: service_healthy
-#     mailhog:
-#        condition: service_started
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 700m
+    ports:
+      - "8083:8083"
+    restart: unless-stopped
+    depends_on:
+      notifications-db:
+        condition: service_healthy
+      store-rabbitmq:
+        condition: service_healthy
+      mail-hog:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 700m
 #    labels:
 #      logging: "promtail"
 

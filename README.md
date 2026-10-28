@@ -149,4 +149,52 @@ http://localhost:8082/actuator/circuitbreakerevents
 ===  viermock with test containers ------
 https://testcontainers.com/guides/testing-rest-api-integrations-in-micronaut-apps-using-wiremock/
 
+===   rebuilding failed image  =====
+PS C:\DEV\store-microservices\order-service> docker image inspect igr025/order-service-img:v0.1 --format '{{.Os}}/{{.Architecture}}'
+linux/arm64
+PS C:\DEV\store-microservices\order-service> ./mvnw spring-boot:build-image
 
+---  Rebuild for specific architecture  docker file is required ----
+docker build --platform linux/amd64 -t catalog-service-img:v0.1 ./catalog-service
+docker build --platform linux/amd64 -t order-service-img:v0.1 ./order-service
+PS C:\DEV\store-microservices> docker build --platform linux/amd64 -t order-service-imgamd:v0.1 ./order-service
+!!!!!!!!!! linux/arm64 is not correct configuration on my laptop !!!!!!!!
+!!!!!!!  in order to use  linux/amd64  configuration  need to explicitly specify in pom.xml  !!!!!
+<plugin>
+<groupId>org.springframework.boot</groupId>
+<artifactId>spring-boot-maven-plugin</artifactId>
+<configuration>
+<image>
+<name>${dockerImageName}</name>
+</image>
+<imagePlatform>linux/amd64</imagePlatform>
+</configuration>
+<executions>
+<execution>
+<goals>
+<goal>build-info</goal>
+</goals>
+</execution>
+</executions>
+</plugin>
+
+PS C:\DEV\store-microservices\order-service> ./mvnw spring-boot:build-image
+PS C:\DEV\store-microservices\notification-service> ./mvnw spring-boot:build-image
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+task restart
+// should normally rebuild the images and start containers
+
+------ implementing notification service -----
+https://www.youtube.com/watch?v=a1WYLukl_cc&list=PLuNxlOYbv61g_ytin-wgkecfWDKVCEDmB&index=11
+--- rabbit MQ ---
+http://localhost:15672/#/exchanges
+usr: guest
+pwd: guest
+--- mailhog UI ---
+http://localhost:8025/
+
+===  CANN RUN THE ENTIRE PROJECT ====
+PS C:\DEV\store-microservices\deployment\docker-compose> docker compose -f infra-apps.yml up -d
+---  adding API Gateway ----
+https://www.youtube.com/watch?v=n2QiHmn2o4E&list=PLuNxlOYbv61g_ytin-wgkecfWDKVCEDmB&index=12

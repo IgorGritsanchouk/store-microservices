@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 interface OrderRepository extends JpaRepository<OrderEntity, Long> {
     List<OrderEntity> findByStatus(OrderStatus status);
 
+    // List<OrderEntity> findByUserName(String userName);
+
     Optional<OrderEntity> findByOrderNumber(String orderNumber);
 
     default void updateOrderStatus(String orderNumber, OrderStatus status) {

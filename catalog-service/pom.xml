@@ -130,6 +130,7 @@
 					<image>
 						<name>${dockerImageName}</name>
 					</image>
+					<imagePlatform>linux/amd64</imagePlatform>
 				</configuration>
 				<executions>
 					<execution>

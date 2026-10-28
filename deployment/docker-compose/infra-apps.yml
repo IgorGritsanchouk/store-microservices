@@ -1,0 +1,176 @@
+name: 'store-microservices'
+services:
+#####################  infrastructure  #####################
+  catalog-db:
+    image: postgres:18-alpine
+    container_name: catalog-db-cnr
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=catalog_pgs_db
+    ports:
+      - "15432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 500m
+
+  orders-db:
+    image: postgres:18-alpine
+    container_name: orders-db-cnr
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=orders_pgs_db
+    ports:
+      - "25432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 500m
+
+  store-rabbitmq:
+    image: rabbitmq:4.0.4-management
+    #image: rabbitmq:3.12.11-management
+    container_name: store-rabbitmq-cnr
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 30s
+      timeout: 30s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          memory: 500m
+
+  notifications-db:
+    image: postgres:18-alpine
+    container_name: notifications-db-cnr
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=notifications_pgs_db
+    ports:
+      - "35432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 500m
+
+  mail-hog:
+    image: mailhog/mailhog:v1.0.1
+    container_name: mailhog-cnr
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+######################  apps  ##################
+  catalog-service:
+    image: igr025/catalog-service-img:v0.1
+    container_name: catalog-service-cnr
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_URL=jdbc:postgresql://catalog-db-cnr:5432/catalog_pgs_db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+    #     - SWAGGER_API_GATEWAY_URL=http://api-gateway:8989/catalog
+    #     - MANAGEMENT_TRACING_EXPORT_ENABLED=${MANAGEMENT_TRACING_EXPORT_ENABLED}
+    #      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+    depends_on:
+      catalog-db:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+    #    labels:
+    #      logging: "promtail"
+
+
+  order-service:
+    image: igr025/order-service-img:v0.1
+    container_name: order-service-cnr
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - ORDERS_CATALOG_SERVICE_URL=http://catalog-service-cnr:8081
+        #    - ORDERS_CATALOG_SERVICE_URL=http://api-gateway:8989/catalog
+      - DB_URL=jdbc:postgresql://orders-db-cnr:5432/orders_pgs_db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - RABBITMQ_HOST=store-rabbitmq-cnr
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+      #      - OAUTH2_SERVER_URL=http://keycloak:9191
+      #      - SWAGGER_API_GATEWAY_URL=http://api-gateway:8989/orders
+      #      - MANAGEMENT_TRACING_EXPORT_ENABLED=${MANAGEMENT_TRACING_EXPORT_ENABLED}
+      #      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411
+    ports:
+      - "8082:8082"
+    restart: unless-stopped
+    depends_on:
+      orders-db:
+        condition: service_healthy
+      store-rabbitmq:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+
+  notification-service:
+    image: igr025/notification-service-img:v0.1
+    container_name: notification-service-cnr
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DB_URL=jdbc:postgresql://notifications-db:5432/notifications_pgs_db
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - RABBITMQ_HOST=store-rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=guest
+      - RABBITMQ_PASSWORD=guest
+      - MAIL_HOST=mail-hog
+      - MAIL_PORT=1025
+    #      - MANAGEMENT_TRACING_EXPORT_ENABLED=${MANAGEMENT_TRACING_EXPORT_ENABLED}
+    #      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411
+    ports:
+      - "8083:8083"
+    restart: unless-stopped
+    depends_on:
+      notifications-db:
+        condition: service_healthy
+      store-rabbitmq:
+        condition: service_healthy
+      mail-hog:
+        condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+#    labels:
+#      logging: "promtail"
