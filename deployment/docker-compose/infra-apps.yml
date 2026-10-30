@@ -94,7 +94,7 @@ services:
       - DB_URL=jdbc:postgresql://catalog-db-cnr:5432/catalog_pgs_db
       - DB_USERNAME=postgres
       - DB_PASSWORD=postgres
-    #     - SWAGGER_API_GATEWAY_URL=http://api-gateway:8989/catalog
+      - SWAGGER_API_GATEWAY_URL=http://api-gateway-cnr:8989/catalog
     #     - MANAGEMENT_TRACING_EXPORT_ENABLED=${MANAGEMENT_TRACING_EXPORT_ENABLED}
     #      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411
     ports:
@@ -116,8 +116,8 @@ services:
     container_name: order-service-cnr
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - ORDERS_CATALOG_SERVICE_URL=http://catalog-service-cnr:8081
-        #    - ORDERS_CATALOG_SERVICE_URL=http://api-gateway:8989/catalog
+      ## directly - ORDERS_CATALOG_SERVICE_URL=http://catalog-service-cnr:8081
+      - ORDERS_CATALOG_SERVICE_URL=http://api-gateway-cnr:8989/catalog
       - DB_URL=jdbc:postgresql://orders-db-cnr:5432/orders_pgs_db
       - DB_USERNAME=postgres
       - DB_PASSWORD=postgres
@@ -126,7 +126,7 @@ services:
       - RABBITMQ_USERNAME=guest
       - RABBITMQ_PASSWORD=guest
       #      - OAUTH2_SERVER_URL=http://keycloak:9191
-      #      - SWAGGER_API_GATEWAY_URL=http://api-gateway:8989/orders
+      - SWAGGER_API_GATEWAY_URL=http://api-gateway-cnr:8989/orders
       #      - MANAGEMENT_TRACING_EXPORT_ENABLED=${MANAGEMENT_TRACING_EXPORT_ENABLED}
       #      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411
     ports:
@@ -168,6 +168,25 @@ services:
         condition: service_healthy
       mail-hog:
         condition: service_started
+    deploy:
+      resources:
+        limits:
+          memory: 700m
+#    labels:
+#      logging: "promtail"
+
+  api-gateway:
+    image: igr025/api-gateway-img:v0.1
+    container_name: api-gateway-cnr
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - CATALOG_SERVICE_URL=http://catalog-service-cnr:8081
+      - ORDER_SERVICE_URL=http://order-service-cnr:8082
+    #      - MANAGEMENT_TRACING_EXPORT_ENABLED=${MANAGEMENT_TRACING_EXPORT_ENABLED}
+    #      - MANAGEMENT_ZIPKIN_TRACING_ENDPOINT=http://tempo:9411
+    ports:
+      - "8989:8989"
+    restart: unless-stopped
     deploy:
       resources:
         limits:

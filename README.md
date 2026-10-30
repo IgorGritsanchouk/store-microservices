@@ -198,3 +198,13 @@ http://localhost:8025/
 PS C:\DEV\store-microservices\deployment\docker-compose> docker compose -f infra-apps.yml up -d
 ---  adding API Gateway ----
 https://www.youtube.com/watch?v=n2QiHmn2o4E&list=PLuNxlOYbv61g_ytin-wgkecfWDKVCEDmB&index=12
+
+--- swagger-ui ---
+http://localhost:8989/swagger-ui/index.html
+
+--- without api-gateway  ---
+http://localhost:8081/api/products
+http://localhost:8082/api/orders
+-- accessing catalog service via api-gateway ---
+http://localhost:8989/catalog/api/products
+http://localhost:8989/orders/api/orders
